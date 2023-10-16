@@ -5,5 +5,6 @@ from nflows.distributions.normal import (
     ConditionalDiagonalNormal,
     DiagonalNormal,
     StandardNormal,
+    GaussMixture,
 )
 from nflows.distributions.uniform import LotkaVolterraOscillating, MG1Uniform

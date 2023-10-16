@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 
-from nflows.distributions.normal import StandardNormal
+from nflows.distributions.normal import StandardNormal, GaussMixture
 from nflows.flows.base import Flow
 from nflows.nn import nets as nets
 from nflows.transforms.base import CompositeTransform
@@ -59,7 +59,9 @@ class ConditionalGlow(Flow):
             mask *= -1
             layers.append(transform)
 
+        dist = GaussMixture(n_modes=5,dim=features)
+        # dist = StandardNormal([features])
         super().__init__(
             transform=CompositeTransform(layers),
-            distribution=StandardNormal([features])
+            distribution=dist
         )
