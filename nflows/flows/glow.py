@@ -31,8 +31,8 @@ class ConditionalGlow(Flow):
         batch_norm_within_layers=True,
     ):
 
-        # coupling_constructor = AdditiveCouplingTransform
-        coupling_constructor = AffineCouplingTransform
+        coupling_constructor = AdditiveCouplingTransform
+        # coupling_constructor = AffineCouplingTransform
 
         mask = torch.ones(features)
         mask[::2] = -1
@@ -59,7 +59,7 @@ class ConditionalGlow(Flow):
             mask *= -1
             layers.append(transform)
 
-        dist = GaussMixture(n_modes=5,dim=features)
+        dist = GaussMixture(n_modes=2,dim=features,trainable=True)
         # dist = StandardNormal([features])
         super().__init__(
             transform=CompositeTransform(layers),
