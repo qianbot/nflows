@@ -203,6 +203,8 @@ class GaussMixture(Distribution):
 
         if loc is None:
             loc = np.random.randn(self.n_modes, self.dim)
+            # loc = np.zeros((self.n_modes, self.dim))
+
         loc = np.array(loc)[None, ...]
         if scale is None:
             scale = np.ones((self.n_modes, self.dim))
@@ -246,13 +248,21 @@ class GaussMixture(Distribution):
         mode_1h = nn.functional.one_hot(mode, self.n_modes)
         mode_1h = mode_1h[..., None]
 
-        # Get samples
-        eps_ = torch.randn(
-            num_samples, self.dim, dtype=self.loc.dtype, device=self.loc.device
-        )
-        scale_sample = torch.sum(torch.exp(self.log_scale) * mode_1h, 1)
-        loc_sample = torch.sum(self.loc * mode_1h, 1)
-        z = eps_ * scale_sample + loc_sample
+        if context == None:
+            raise NotImplementedError('sample from GMM with empty context is not implemented')
+        else:
+            # The value of the context is ignored, only its size and device are taken into account.
+            context_size = context.shape[0]
+
+            # Get samples
+            eps_ = torch.randn(
+                num_samples * context_size, self.dim, dtype=self.loc.dtype, device=self.loc.device
+            )
+            scale_sample = torch.sum(torch.exp(self.log_scale) * mode_1h, 1)
+            loc_sample = torch.sum(self.loc * mode_1h, 1)
+            z = eps_ * scale_sample + loc_sample # z (batch_size, feat_dim)
+            # expand z to (batch_size, 1, feat_dim)
+            z = z[:,None,:]
 
         # # Compute log probability
         # eps = (z[:, None, :] - self.loc) / torch.exp(self.log_scale)
@@ -263,12 +273,6 @@ class GaussMixture(Distribution):
         #     - torch.sum(self.log_scale, 2)
         # )
         # log_p = torch.logsumexp(log_p, 1)
-        if context is not None:
-                        # The value of the context is ignored, only its size and device are taken into account.
-            context_size = context.shape[0]
-            z_size = z.shape[0]
-            z = z[None,:]
-            z = z.repeat(context_size,1,1)
 
         return z #s, log_p
 
