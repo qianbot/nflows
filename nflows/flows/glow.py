@@ -25,6 +25,8 @@ class ConditionalGlow(Flow):
         hidden_features,
         num_layers,
         num_blocks_per_layer,
+        gmm_mode,
+        gmm_trainable=True,
         activation=F.relu,
         dropout_probability=0.5,
         context_features=None,
