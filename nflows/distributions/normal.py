@@ -38,7 +38,7 @@ class StandardNormal(Distribution):
         else:
             # The value of the context is ignored, only its size and device are taken into account.
             context_size = context.shape[0]
-            samples = torch.randn(context_size * num_samples, *self._shape,
+            samples = torch.randn(context_size * num_samples, *self._shape, dtype=torch.double,
                                   device=context.device)
             return torchutils.split_leading_dim(samples, [context_size, num_samples])
 
